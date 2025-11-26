@@ -1,17 +1,12 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.11'   // Python pre-installed
-            args '-u root'        // run as root so pip install works
-        }
-    }
+    agent any
 
     stages {
         stage('Build') {
             steps {
                 echo 'Creating virtual environment and installing dependencies...'
                 sh '''
-                python -m venv venv
+                python3 -m venv venv
                 . venv/bin/activate
                 pip install --upgrade pip
                 pip install -r requirements.txt || true
@@ -23,7 +18,7 @@ pipeline {
                 echo 'Running tests...'
                 sh '''
                 . venv/bin/activate
-                python -m unittest discover -s .
+                python3 -m unittest discover -s .
                 '''
             }
         }
@@ -41,7 +36,7 @@ pipeline {
                 echo 'Running application...'
                 sh '''
                 . venv/bin/activate
-                nohup python ${WORKSPACE}/python-app-deploy/app.py > ${WORKSPACE}/python-app-deploy/app.log 2>&1 &
+                nohup python3 ${WORKSPACE}/python-app-deploy/app.py > ${WORKSPACE}/python-app-deploy/app.log 2>&1 &
                 echo $! > ${WORKSPACE}/python-app-deploy/app.pid
                 '''
             }
@@ -51,7 +46,7 @@ pipeline {
                 echo 'Testing application...'
                 sh '''
                 . venv/bin/activate
-                python ${WORKSPACE}/test_app.py
+                python3 ${WORKSPACE}/test_app.py
                 '''
             }
         }
